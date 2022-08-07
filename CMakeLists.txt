@@ -4,15 +4,17 @@ project(MyProj VERSION 0.1.0 LANGUAGES CXX)
 set(BUILD_STATIC_LIBS ON CACHE BOOL "create static libraries")
 set(BUILD_DYNAMIC_LIBS ON CACHE BOOL "create dynamic libraries")
 
-if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT) # only set during the first time
-	set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "installation path of libary" FORCE)
-endif()
+# if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT) # only set during the first time
+# 	set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "installation path of libary" FORCE)
+# endif()
 
 # might need to add "${CMAKE_BINARY_DIR}/" at the front if in nested project
+set(LIBHELLO_STATIC_LIBPATH "lib/static")
 set(LIBHELLO_DYNAMIC_LIBPATH "lib/dynamic")
 set(LIBHELLO_SOURCES
 	hello.cpp
 )
+
 
 # set output folders instead of setting properties individially
 # set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_INSTALL_PREFIX}/bin") # .dll .so
