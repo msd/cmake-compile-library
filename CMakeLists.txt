@@ -35,6 +35,7 @@ if (BUILD_STATIC_LIBS)
 		message("Compiling static library using static libgcc and libstd++")
 		target_link_libraries(hello_lib_static -static-libgcc -static-libstdc++)
 	endif()
+	target_compile_options(hello_lib_static PUBLIC -fdeclspec)
 endif()
 
 # SHARED DYNAMIC LIBRARY
@@ -54,6 +55,7 @@ if (BUILD_DYNAMIC_LIBS)
 		message("Compiling dynamic library using static libgcc and libstd++")
 		target_link_libraries(hello_lib_dynamic -static-libgcc -static-libstdc++)
 	endif()
+	target_compile_options(hello_lib_dynamic PUBLIC -fdeclspec)
 endif()
 
 # if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU") # minimise binary size
