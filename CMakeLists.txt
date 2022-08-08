@@ -1,8 +1,11 @@
-cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
 project(MyProj VERSION 0.1.0 LANGUAGES CXX)
+
+cmake_policy(SET CMP0054 NEW) # cmake --help-policy CMP0054
 
 set(BUILD_STATIC_LIBS ON CACHE BOOL "create static libraries")
 set(BUILD_DYNAMIC_LIBS ON CACHE BOOL "create dynamic libraries")
+set(BUILD_EXAMPELS OFF CACHE BOOL "compile example programs")
 
 # if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT) # only set during the first time
 # 	set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "installation path of libary" FORCE)
@@ -15,6 +18,16 @@ set(LIBHELLO_SOURCES
 	hello.cpp
 )
 
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+	set(LIBHELLO_USING_MSVC)
+	message(STATUS "Microsft compiler, hence __declspec will be added")
+	add_compile_definitions(MSVC_COMPILER 1)
+endif()
+
+if (MINGW)
+	message(STATUS "Using static libgcc and libstdc++ (MINGW detected)")
+	link_libraries(-static-libgcc -static-libstdc++)
+endif()
 
 # set output folders instead of setting properties individially
 # set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_INSTALL_PREFIX}/bin") # .dll .so
@@ -32,12 +45,6 @@ if (BUILD_STATIC_LIBS)
 		OUTPUT_NAME hello
 		ARCHIVE_OUTPUT_DIRECTORY "${LIBHELLO_STATIC_LIBPATH}"
 	)
-	if (MINGW)
-		message("/!\\ DETECTED MINIMALIST GNU FOR WINDOWS /!\\")
-		message("Compiling static library using static libgcc and libstd++")
-		target_link_libraries(hello_lib_static -static-libgcc -static-libstdc++)
-	endif()
-	target_compile_options(hello_lib_static PUBLIC -fdeclspec)
 endif()
 
 # SHARED DYNAMIC LIBRARY
@@ -53,12 +60,6 @@ if (BUILD_DYNAMIC_LIBS)
 		RUNTIME_OUTPUT_DIRECTORY "${LIBHELLO_DYNAMIC_LIBPATH}" # .dll (win) .so (linux)
  		LIBRARY_OUTPUT_DIRECTORY "${LIBHELLO_DYNAMIC_LIBPATH}" # .dylib (mac)
 	)
-	if (MINGW)
-		message("/!\\ DETECTED MINIMALIST GNU FOR WINDOWS /!\\")
-		message("Compiling dynamic library using static libgcc and libstd++")
-		target_link_libraries(hello_lib_dynamic -static-libgcc -static-libstdc++)
-	endif()
-	target_compile_options(hello_lib_dynamic PUBLIC -fdeclspec)
 endif()
 
 # if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU") # minimise binary size
@@ -67,3 +68,8 @@ endif()
 
 
 # target_compile_features(hello_lib_dynamic PUBLIC cxx_std_17) # set language standard
+
+if (BUILD_EXAMPLES)
+	add_executable(main main.cpp)
+	target_link_libraries(main hello_lib_static)
+endif()
